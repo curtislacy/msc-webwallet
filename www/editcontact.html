@@ -17,6 +17,7 @@
     <link href="css/search.css" rel="stylesheet" />
     <script src="js/jquery-1.10.1.min.js"></script>
     <script src="js/angular.js"></script>
+    <script src="js/angular-route.js"></script>
     
     <script src="js/sjcl.js"></script>
     <script src="js/bitcoinjs-lib.js"></script>
@@ -33,10 +34,10 @@
       <script src="btc01.js"></script>
       <script src="js/bootstrap-combobox.js"></script>
       <script>
-         var myApp = angular.module('myApp', ['truncate']);
+         var myApp = angular.module('myApp', [ 'truncate', 'ngRoute' ]);
       </script>
       <script src="js/bootstrap.min.js"></script>
-      <script src="wallet.js"></script>
+      <script src="editcontact.js"></script>
       <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
       <!--[if lt IE 9]>
       <script src="js/html5shiv.js"></script>
@@ -83,62 +84,42 @@
             <div class="container page-container">
                 <div class="row">
                     <div class="no-fixed col-sm-9 col-sm-push-3 col-md-10 col-md-push-2">
-                        <div class="AcceptOfferController" ng-controller="AcceptOfferController" ng-init="getSellofferData()">
+                        <div class="EditContactController" ng-controller="EditContactController">
 
 
                             <div class="col-md-6">
-                                <h2>Send coins
-                                </h2>
+                                <h2>Edit Contact</h2>
 
-
-                                <div class="input string optional" id="fromAddressOrPublicKeyDiv">
+                                <div class="input string optional">
                                     <!-- <div class="ui-widget">-->
-                                    <label class="string optional" for="publicKey">Address</label>
+                                    <label class="string optional" for="address">Address</label>
 
-                                    <input class="string form-control" ng-readonly="address" id="recipient"
-                                        ng-model="address"
-                                        type="text">
-                                </div>
-
-
-
-                                <div class="input string optional">
-
-                                    <label class="string optional" for="amount">Amount</label>
-                                    <input class="string optional form-control" id="amount"
-                                        ng-model="amount"
-                                        ng-change="AmountChanged()"
-                                        step="{{step}}"
-                                        type="number">
-
+                                    <input class="string form-control" id="address" type="text" ng-model="address" ng-readonly="addressReadOnly">
                                 </div>
 
                                 <div class="input string optional">
-									<label class="string optional" for="fee">Fee</label>
-									<input class="string optional form-control" id="fee"
-										ng-model="fee"
-										step="0.0001"
-										type="number">
-                                </div>
+                                    <!-- <div class="ui-widget">-->
+                                    <label class="string optional" for="name">Name</label>
 
-                                <div class="input string optional">
-                                    <label class="string optional" for="recipient">To</label>
-                                    <input class="string optional form-control" ng-readonly="toAddrReadOnly" id="recipient"
-                                        ng-model="toAddress"
+                                    <input class="string form-control" id="name"
+                                        ng-model="name"
                                         type="text">
                                 </div>
 
                                 <div class="input string optional">
-                                    <label class="string optional" for="currency">Currency</label>
-                                    <input class="string optional form-control" readonly="readonly" id="currency"
-                                        ng-model="currency"
+                                    <!-- <div class="ui-widget">-->
+                                    <label class="string optional" for="email">Email</label>
+
+                                    <input class="string form-control" id="email"
+                                        ng-model="email"
                                         type="text">
                                 </div>
+
 
                                 <div>
                                     <button class="btn btn-primary btnMargin"
-                                        id="createRawTransaction">
-                                        Prepare
+                                        id="submitContactDetails">
+                                        Set
                                     </button>
                                 </div>
 
