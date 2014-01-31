@@ -14,6 +14,7 @@
                         <li class="c-visible-xs"><a href="wallet.html">Wallet</a></li>
                         <li><a href="/">Recent</a></li>
                         <li><a href="/">Orderbook</a></li>
+                        <li><a href="Addresses.html">Address Book</a></li>
                         <li><a href="About.html">Info</a></li>
                         <li>
                            <a class="searchLI">
