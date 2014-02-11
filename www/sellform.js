@@ -1,5 +1,5 @@
 var initialAmount = 0;
-function AcceptOfferController($scope, $http) {
+function SellOfferController($scope, $http) {
     $scope.transactionInformation;
  
     $scope.footer = "FOOTER";

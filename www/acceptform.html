@@ -124,7 +124,7 @@
                                     <select class="select optional form-control form-control30px combobox"
                                         id="buyerAddressOrPublicKey" name="buyerAddressOrPublicKey">
                                         <!-- ng-model="transactionInformation.to_address"
-                                                ng-change="comboBoxValueChange(this)"-->
+                                                ng-change="uiHandler.comboBoxValueChange(this)"-->
                                     </select>
                                     <!-- </div>
                                         <button id="toggle">Show underlying select</button>-->
@@ -139,7 +139,7 @@
                                     <label class="string optional" for="amount">Amount</label>
                                     <input class="string optional form-control" id="amount"
                                         ng-model="transactionInformation.formatted_amount"
-                                        ng-change="AmountChanged()"
+                                        ng-change="uiHandler.amountChanged()"
                                         step="{{step}}"
                                         type="number">
                                     <p id="amountWarning" class="amountWarning">
@@ -202,7 +202,7 @@
                                 <div class="input string optional">
                                     <label class="string optional" for="privateKey">Private key</label>
                                     <input class="string optional form-control" id="privateKey"
-                                        ng-model="key" ng-change="keyChange()"
+                                        ng-model="key" ng-change="uiHandler.keyChange()"
                                         type="text">
                                     <span class="invalidKey redText">Invalid key</span>
                                 </div>

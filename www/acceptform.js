@@ -1,4 +1,31 @@
 var initialAmount = 0;
+
+function UIHandler( $scope ) {
+    this.$scope = $scope;
+
+    $('.invalidKey').hide();
+};
+UIHandler.prototype.keyChange = function () {
+
+    if (this.$scope.key != "") {
+        $('#reSign').attr('disabled', false);
+    }
+    else {
+        $('#reSign').attr('disabled', true);
+    }
+};
+UIHandler.prototype.comboBoxValueChange = function () {
+    console.log(this.$scope.transactionInformation);
+}
+UIHandler.prototype.amountChanged = function () {
+    $('#amountWarning').hide();
+    if (initialAmount < $scope.transactionInformation.formatted_amount) {
+        // Amount higher than offer - Should tell the user that 
+        console.log("blue warning");
+        $('#amountWarning').show();
+    }
+}
+
 function AcceptOfferController($scope, $http) {
     $scope.transactionInformation;
  
@@ -12,15 +39,7 @@ function AcceptOfferController($scope, $http) {
     $scope.fee = 0.0005;
     $scope.key = "";
 
-    $scope.keyChange = function () {
-
-        if ($scope.key != "") {
-            $('#reSign').attr('disabled', false);
-        }
-        else {
-            $('#reSign').attr('disabled', true);
-        }
-    };
+    $scope.uiHandler = new UIHandler( $scope );
 
     $scope.getSellofferData = function () {
 
@@ -57,20 +76,6 @@ function AcceptOfferController($scope, $http) {
       
     }
 
-    $scope.comboBoxValueChange = function () {
-        console.log($scope.transactionInformation);
-    }
-
-    $scope.AmountChanged = function () {
-        $('#amountWarning').hide();
-        if (initialAmount < $scope.transactionInformation.formatted_amount) {
-            // Amount higher than offer - Should tell the user that 
-            console.log("blue warning");
-            $('#amountWarning').show();
-        }
-    }
-    
-    $('.invalidKey').hide();
 }
 
 
