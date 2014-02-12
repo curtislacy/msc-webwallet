@@ -10,14 +10,13 @@ trap "kill_child_processes 1 $$; exit 0" INT
 
 APPDIR=`pwd`
 TOOLSDIR=$APPDIR/node_modules/mastercoin-tools
-DATADIR="/tmp/omniwallet"
+DATADIR="/var/lib/omniwallet"
 LOCK_FILE=$DATADIR/msc_cron.lock
 PARSE_LOG=$DATADIR/parsed.log
 VALIDATE_LOG=$DATADIR/validated.log
 ARCHIVE_LOG=$DATADIR/archived.log
 
-if [ ! -d $DATADIR ]; then
-	mkdir -p $DATADIR
+if [ ! -d $DATADIR/tx ]; then
 	cp -r $TOOLSDIR/www/tx-bootstrap $DATADIR/tx
 fi
 
@@ -39,7 +38,7 @@ do
 
 		mkdir -p $DATADIR
 		cd $DATADIR
-		mkdir -p tx addr general offers mastercoin_verify/addresses mastercoin_verify/transactions www
+		mkdir -p tx addr general offers wallets mastercoin_verify/addresses mastercoin_verify/transactions www
 
 		# parse until full success
 		x=1 # assume failure

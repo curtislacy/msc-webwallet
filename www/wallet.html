@@ -14,18 +14,18 @@
          <meta http-equiv="refresh" content="0;url=javascript_required.html">
       </noscript>
       <!-- Bootstrap core CSS -->
-      <link href="css/bootstrap.css" rel="stylesheet">
+      <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
       <link href="css/bootstrap-theme.css" rel="stylesheet">
-      <link href="css/bootstrap-combobox.css" rel="stylesheet"> 
+      <link href="bower_components/bootstrap/dist/css/bootstrap-combobox.css" rel="stylesheet"> 
       <link href="css/search.css" rel="stylesheet">
-      <script src="js/jquery-1.10.1.min.js"></script>
-      <script src="js/angular.js"></script>
+      <script src="bower_components/jquery/jquery.min.js"></script>
+      <script src="bower_components/angular/angular.min.js"></script>
       <script src="btcutils.js"></script>
       <script src="js/truncate.js"></script>
       <script src="masterPage.js"></script>
       <script src="btc02.js"></script>
       <script src="js/bootstrap-combobox.js"></script>
-      <script src="js/sjcl.js"></script>
+      <script src="bower_components/sjcl.js"></script>
       <script src="js/bitcoinjs-lib.js"></script>
       <script>
          //namespacing concerns, can't sign and decode on same page without this
@@ -35,12 +35,12 @@
 
          var myApp = angular.module('myApp', ['truncate']);
       </script>
-      <script src="js/bootstrap.min.js"></script>
+      <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
       <script src="wallet.js"></script>
       <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
       <!--[if lt IE 9]>
-      <script src="js/html5shiv.js"></script>
-      <script src="js/respond.min.js"></script>
+      <script src="bower_components/html5shiv/dist/html5shiv.js"></script>
+      <script src="bower_components/respond/dest/respond.min.js"></script>
       <![endif]-->
    </head>
    <body>
@@ -91,7 +91,8 @@
 							<td>Tools</td>
 							<td class="btnCell">
 							<button type="button" ng-click="CreateNewWallet()" class="btc-tbl-btn pull-right btn btn-success btn-xs">Create new wallet</button>
-							<button type="button" class="btc-tbl-btn pull-right btn btn-success btn-xs">Sync with server</button>
+							<button type="button" ng-click="SyncWithServer()" class="btc-tbl-btn pull-right btn btn-success btn-xs">Sync with server</button>
+							<button type="button" onclick="$('.uuidentry').show()" class="btc-tbl-btn pull-right btn btn-success btn-xs">Sync with server</button>
               <button type="button" style="margin-top:5px;" onclick="$('.priverror').hide();$('.priventry').show()" class="col-xs-4 btc-tbl-btn pull-right btn btn-success btn-xs">Add priv key</button>
               <button type="button" style="margin-top:5px;" onclick="$('.priverror').hide();$('.privdecode').show()" class="col-xs-5 btc-tbl-btn pull-right btn btn-success btn-xs">Export priv key</button>
 
@@ -116,6 +117,13 @@
             </select>
             <input type="text" name=passphrase class="form-control" placeholder="enter passphrase to decrypt above address in wallet">
             <input type="button" value=decrypt onclick="$('#privateKey').val(Wallet.DecryptPrivKey(Wallet.GetWallet().keys[document.getElementById('BTCAddressSelector').selectedIndex].encrypted, document.forms['privkeydecode'].passphrase.value))" style=width:100% placeholder="decrypt and sign"></input>
+          </form>
+
+          <form name=uuidEntry class="uuidentry input-group" style="display:none; margin-bottom:40px">
+            <span class="input-group-addon">Enter UUID:</span>
+            <input type="text" name=uuidentry class="form-control" placeholder="550e8400-e29b-41d4-a716-446655440000">
+            <input type="text" name=password class="form-control" placeholder="enter passphrase to decrypt wallet locally">
+            <input type="button" value=submit ng-click="AddPrivKey()" style=width:100% placeholder="submit"></input>
           </form>
 				</div>
             		    </div>
