@@ -246,38 +246,38 @@ BTNClientContext.Signing.Verify = function () {
 
     var ok = true;
     $.post('/v1/transaction/validateaddr/', dataToSend, function (data) {
-    console.log('success');
-    console.log(data);
+        console.log('success');
+        console.log(data);
 
-    if (data.status == 'OK') {
-        ok = true;
-        $('#verifyMessage').addClass('greenText');
-        $('#verifyMessage').text('OK');
-        $('#verifyMessage').show();
-        $scope.uiHandler.resize();
-        return ok;
-    }
-    else {
-        $('#verifyMessage').addClass('greenText');
-        ok = false;
-        if (data.error == 'invalid pubkey') {
-            $('#verifyMessage').text('invalid pubkey');
-        } else {
-            if (data.error == 'missing pubkey') {
-                $('#verifyMessage').text('no pubkey on blockchain');
+        if (data.status == 'OK') {
+            ok = true;
+            $('#verifyMessage').addClass('greenText');
+            $('#verifyMessage').text('OK');
+            $('#verifyMessage').show();
+            $scope.uiHandler.resize();
+            return ok;
+        }
+        else {
+            $('#verifyMessage').addClass('greenText');
+            ok = false;
+            if (data.error == 'invalid pubkey') {
+                $('#verifyMessage').text('invalid pubkey');
             } else {
-    	        $('#verifyMessage').addClass('redText');
-                if (data.error == 'invalid address') {
-                    $('#verifyMessage').text('invalid address');
+                if (data.error == 'missing pubkey') {
+                    $('#verifyMessage').text('no pubkey on blockchain');
                 } else {
-                    $('#verifyMessage').text('invalid');
+        	        $('#verifyMessage').addClass('redText');
+                    if (data.error == 'invalid address') {
+                        $('#verifyMessage').text('invalid address');
+                    } else {
+                        $('#verifyMessage').text('invalid');
+                    }
                 }
             }
         }
-    }
-    $('#verifyMessage').show();
-    $scope.uiHandler.resize();
-    return ok;
+        $('#verifyMessage').show();
+        $scope.uiHandler.resize();
+        return ok;
     }).fail(function () {
 
     console.log('fail');
@@ -302,10 +302,10 @@ BTNClientContext.Signing.SingSource = function () {
     var sourceScript = [];
     var sourceScriptString = $('#sourceScript').val().split(';');
     $.each(sourceScriptString, function (i, val) {
-    sourceScript[i] = new BTNClientContext.parseScript(val);
-    console.log(val);
-    console.log($.toJSON(sourceScript[i]));
-    console.log(BTNClientContext.dumpScript(sourceScript[i]));
+        sourceScript[i] = new BTNClientContext.parseScript(val);
+        console.log(val);
+        console.log($.toJSON(sourceScript[i]));
+        console.log(BTNClientContext.dumpScript(sourceScript[i]));
     });
 
     //create transaction object from BBE JSON
