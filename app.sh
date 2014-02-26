@@ -16,6 +16,8 @@ APPDIR=`pwd`
 TOOLSDIR=$APPDIR/node_modules/mastercoin-tools
 DATADIR="/var/lib/omniwallet"
 
+mkdir -p $DATADIR/wallets
+
 # Mastercoin Parsing Loop
 $APPDIR/bin/parse-msc.sh &
 MSC_LOOP_PID=$!

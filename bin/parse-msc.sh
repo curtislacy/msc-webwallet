@@ -32,7 +32,7 @@ do
 
 		mkdir -p $DATADIR
 		cd $DATADIR
-		mkdir -p tmptx tx addr general offers wallets mastercoin_verify/addresses mastercoin_verify/transactions www
+		mkdir -p tmptx tx addr general offers mastercoin_verify/addresses mastercoin_verify/transactions www
 
 		# parse until full success
 		x=1 # assume failure
@@ -61,6 +61,6 @@ do
 		rm -f $LOCK_FILE
 	fi
 
-	# Wait a minute, and do it all again.
-	sleep 60
+	# Wait a minute, and do it all again.  Actually, we'll wait a little offset, so that our loops don't collide too often.
+	sleep 61
 done
