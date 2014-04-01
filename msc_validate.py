@@ -63,7 +63,7 @@ coins_reverse_short_name_dict=dict((v,k) for k, v in coins_short_name_dict.iteri
 offers_dict={}
 
 # create a property dict
-property_dict={}
+properties_dict={}
 
 # global last block on the net
 last_height=get_last_height()
@@ -1433,7 +1433,7 @@ def validate():
 
     # go over all tx
     for t in sorted_tx_list:
-
+        
         # check alarm (verify accept offers get payment in time)
         try:
             current_block=int(t['block'])

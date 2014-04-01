@@ -470,11 +470,14 @@ def parse_multisig(tx, tx_hash='unknown'):
                                         long_packet += datahex[4:-2].upper()
 
                                     spare_bytes = ''
+
+                                    #set these fields for validation
+                                    parse_dict['formatted_amount'] = 0
+                                    parse_dict['currency_str'] = 'Test Mastercoin'
+                                    parse_dict['currencyId'] = 0
+
                                     #unneeded fields
-                                    parse_dict.pop('currencyId', None)
-                                    parse_dict.pop('currency_str', None)
                                     parse_dict.pop('amount', None)
-                                    parse_dict.pop('formatted_amount', None)
                                     parse_dict.pop('bitcoin_amount_desired', None)
                                     parse_dict.pop('block_time_limit', None)
 
