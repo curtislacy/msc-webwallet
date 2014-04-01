@@ -62,6 +62,9 @@ coins_reverse_short_name_dict=dict((v,k) for k, v in coins_short_name_dict.iteri
 # create modified tx dict which would be used to modify tx files
 offers_dict={}
 
+# create a property dict
+property_dict={}
+
 # global last block on the net
 last_height=get_last_height()
 
@@ -692,6 +695,13 @@ def add_offers(key, t):
     else:
         offers_dict[key]=[t['tx_hash']]
 
+# add another property  to the modified dict
+def add_properties(key, t):
+    if properties_dict.has_key(key):
+        properties_dict[key].append(t['tx_hash'])
+    else:
+        properties_dict[key]=[t['tx_hash']]
+
 # write back to fs all tx which got modified
 def write_back_modified_tx():
     n=-1 # relevant is last tx on the list
@@ -711,6 +721,16 @@ def update_offers():
             offers.append(tx_dict[b_hash][-1])
         # write updated offers
         atomic_json_dump(offers, 'offers/offers-'+tx_hash+'.json', add_brackets=False)
+
+# create prop json
+def update_properties():
+    for tx_hash in properties_dict.keys():
+        # generate tx list for each tx_hash
+        properties=[]
+        for prop_hash in properties_dict[tx_hash]:
+            properties.append(tx_dict[prop_hash][-1])
+        # write updated props
+        atomic_json_dump(properties, 'properties/properties-'+tx_hash+'.json', add_brackets=False)
 
 def update_bitcoin_balances():
     if msc_globals.b == True:
@@ -1349,8 +1369,18 @@ def check_mastercoin_transaction(t, index=-1):
                     debug_address(to_addr,c, 'after sell accept')
                     return True
                 else:
-                    info('unknown tx type: '+t['tx_type_str']+' in '+tx_hash)
-                    return False
+                    if t['tx_type_str']==transaction_type_dict['0032']:
+                        debug('fixed property creation from '+t['from_address']+' '+t['tx_hash'])
+                        transaction_version=t['transactionVersion']
+                        if transaction_version != '0000' and transaction_version != '0001':
+                            info('non supported property version with transaction version '+transaction_version)
+                            mark_tx_invalid(t['tx_hash'], 'non supported sell offer with transaction version '+transaction_version)
+                            return False
+
+                        add_properties(t['tx_hash'],t)
+                    else:
+                        info('unknown tx type: '+t['tx_type_str']+' in '+tx_hash)
+                        return False
 
 
 #########################################################################
@@ -1432,6 +1462,9 @@ def validate():
 
     # create json for offers
     update_offers()
+
+    # create json for properties
+    update_properties()
 
     # update changed tx
     write_back_modified_tx()

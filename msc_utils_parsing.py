@@ -14,7 +14,7 @@ from msc_utils_obelisk import *
 
 currency_type_dict={'00000001':'Mastercoin','00000002':'Test Mastercoin'}
 reverse_currency_type_dict={'Mastercoin':'00000001','Test Mastercoin':'00000002'}
-transaction_type_dict={'0000':'Simple send', '0014':'Sell offer', '0016':'Sell accept'}
+transaction_type_dict={'0000':'Simple send', '0014':'Sell offer', '0016':'Sell accept', '0032':'Fixed property creation'}
 sell_offer_action_dict={'00':'Undefined', '01':'New', '02':'Update', '03':'Cancel'}
 exodus_address='1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P'
 first_exodus_bootstrap_block=249498
@@ -307,7 +307,8 @@ def parse_multisig(tx, tx_hash='unknown'):
             to_address=o['address']
             continue
 
-    for o in outputs_list_no_exodus:
+    data_script_list = []
+    for idx,o in enumerate(outputs_list_no_exodus):
         if o['address']==None: # This should be the multisig
             script=o['script']
             # verify that it is a multisig
@@ -326,18 +327,19 @@ def parse_multisig(tx, tx_hash='unknown'):
                 return {'tx_hash':tx_hash, 'invalid':(True, 'error m-of-n with n out of range')}
 
             # parse the BIP11 pubkey list
-            data_script_list=[]
             for i in range(MAX_PUBKEY_IN_BIP11-1):
                 index=i+2 # the index of the i'th pubkey
                 try:
-                    data_script_list.append(fields[index].split(' ]')[0])
+                    data_script = fields[index].split(' ]')[0]
+                    if data_script not in data_script_list: 
+                        data_script_list.append(data_script)
                 except IndexError:
                     break
 
             # prepare place holder lists for obfus,deobfus,data_dict
             dataHex_deobfuscated_list=[]
             data_dict_list=[]
-           
+
             if input_addr == None:
                 info('none input address (BIP11 inputs are not supported yet)')
                 return {'tx_hash':tx_hash, 'invalid':(True, 'not supported input (BIP11/BIP16)')}
@@ -456,9 +458,60 @@ def parse_multisig(tx, tx_hash='unknown'):
                             # parse as bitcoin payment to get the tx fee
                             bitcoin_dict=parse_bitcoin_payment(tx, tx_hash)
                             parse_dict['formatted_fee']=bitcoin_dict['fee']
+                        else:
+                            if data_dict['transactionType'] == '0032': # Smart Property
+                                if idx == len(outputs_list_no_exodus)-1: # we are on last output
+                                    long_packet = ''
+                                    for datahex in dataHex_deobfuscated_list:
+                                        if len(datahex)<42:
+                                            info('invalid data script '+data_script.encode('hex_codec'))
+                                            parse_dict['invalid']=(True, 'datahex is not right length')
+                                        parse_dict['baseCoin']=datahex[0:2] # 00 for BTC
+                                        long_packet += datahex[4:-2].upper()
 
-                        else: # non valid tx type
-                            return {'tx_hash':tx_hash, 'invalid':(True, 'non supported tx type '+data_dict['transactionType'])}
+                                    spare_bytes = ''
+                                    #unneeded fields
+                                    parse_dict.pop('currencyId', None)
+                                    parse_dict.pop('currency_str', None)
+                                    parse_dict.pop('amount', None)
+                                    parse_dict.pop('formatted_amount', None)
+                                    parse_dict.pop('bitcoin_amount_desired', None)
+                                    parse_dict.pop('block_time_limit', None)
+
+                                    parse_dict['tx_hash'] = tx_hash
+
+                                    #fixed fields
+                                    parse_dict['transactionVersion']=long_packet[0:4]
+                                    parse_dict['transactionType']=long_packet[4:8]
+                                    parse_dict['ecosystem']=long_packet[8:10]
+                                    parse_dict['property_type']=long_packet[10:14]
+                                    parse_dict['previous_property_id']=long_packet[14:22]
+
+                                    #non-hex version for UI
+                                    parse_dict['formatted_transactionVersion']=int(long_packet[0:4],16)
+                                    parse_dict['formatted_transactionType']=int(long_packet[4:8],16)
+                                    parse_dict['formatted_ecosystem']=int(long_packet[8:10],16)
+                                    parse_dict['formatted_property_type']=int(long_packet[10:14],16)
+                                    parse_dict['formatted_previous_property_id']=int(long_packet[14:22],16)
+                                    #prepare var-fields for processing
+                                    spare_bytes = ''.join(long_packet[22:])
+
+                                    #var fields
+                                    try:
+                                        parse_dict['propertyCategory']=spare_bytes.split('00')[0].decode('hex')
+                                        parse_dict['propertySubcategory']=spare_bytes.split('00')[1].decode('hex')
+                                        parse_dict['propertyName']=spare_bytes.split('00')[2].decode('hex')
+                                        parse_dict['propertyUrl']=spare_bytes.split('00')[3].decode('hex')
+                                        parse_dict['propertyData']=spare_bytes.split('00')[4].decode('hex')
+                                    except TypeError:
+                                        error('cannot parse smart property fields')
+
+                                    num_var_fields = 5
+                                    len_var_fields = len(''.join(spare_bytes.split('00')[:num_var_fields]) + ('00'*num_var_fields) )
+
+                                    parse_dict['numberOfProperties']=str(int(spare_bytes[len_var_fields:len_var_fields+16],16))
+                            else: # non valid tx type
+                                return {'tx_hash':tx_hash, 'invalid':(True, 'non supported tx type '+data_dict['transactionType'])}
 
         else: # not the multisig output
             # the output with dust
