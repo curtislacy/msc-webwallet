@@ -520,10 +520,10 @@ def check_bitcoin_payment(t):
 
 
 # A fresh initialized address entry
-def new_addr_entry():
+def new_addr_entry(curr):
     entry={}
     # for each currency
-    for c in coins_list+['Bitcoin']:
+    for c in coins_list+['Bitcoin',curr]:
         currency_dict={}
         # initialize all properties
         for property in addr_properties:
@@ -615,14 +615,18 @@ def update_addr_dict(addr, accomulate, *arguments, **keywords):
     # 'Mastercoin', 'Test Mastercoin', 'Bitcoin' or 'exodus' for exodus purchases
     # then come the keywords and values to be updated
     c=arguments[0]
-    if c!='Mastercoin' and c!='Test Mastercoin' and c!='exodus' and c!= 'Bitcoin':
+    if c!='Mastercoin' and c!='Test Mastercoin' and c!='exodus' and c!= 'Bitcoin' and c!='Smart Property':
         info('BUG: update_addr_dict called with unsupported currency: '+c)
         return False
+    
+    # get the property name for smart property
+    if c == 'Smart Property':
+        c = arguments[1]
 
     # is there already entry for this address?
     if not addr_dict.has_key(addr):
         # no - so create a new one
-        addr_dict[addr]=new_addr_entry()
+        addr_dict[addr]=new_addr_entry(c)
 
     # update all given fields with new values
     keys = sorted(keywords.keys())
@@ -773,7 +777,13 @@ def generate_api_jsons():
         balances_list=[]
         addr_dict_api={}
         addr_dict_api['address']=addr
-        for c in coins_list:
+        
+        #takes keys including smart properties minus exodus and btc
+        addr_keys = addr_dict[addr].keys()
+        addr_keys.remove('exodus')
+        addr_keys.remove('Bitcoin')
+
+        for c in addr_keys:
             sub_dict={}
             sub_dict['received_transactions']=addr_dict[addr][c]['in_tx']
             sub_dict['received_transactions'].reverse()
@@ -964,7 +974,7 @@ def check_mastercoin_transaction(t, index=-1):
         update_tx_dict(t['tx_hash'], color='bgc-done', icon_text='Exodus')
     else:
         c=currency
-        if c!='Mastercoin' and c!='Test Mastercoin':
+        if c!='Mastercoin' and c!='Test Mastercoin' and c!='Smart Property':
             debug('unknown currency '+currency+ ' in tx '+tx_hash)
             return False
         # left are normal transfer and sell offer/accept
@@ -1377,7 +1387,28 @@ def check_mastercoin_transaction(t, index=-1):
                             mark_tx_invalid(t['tx_hash'], 'non supported sell offer with transaction version '+transaction_version)
                             return False
 
+                        #used later in validation
+                        #ecosystem = t['ecosystem']
+                        #property_type = t['property_type']
+                        prev_prop_id = int(t['previous_property_id'])
+                        #prop_cat = t['propertyCategory']
+                        #prop_subcat = t['propertySubcategory']
+                        prop_name = t['propertyName']
+                        #prop_url = t['propertyUrl']
+                        #prop_data = t['propertyData']
+                        num_prop = t['numberOfProperties']
+
+                        # update to_addr
+                        update_addr_dict(from_addr, True, c, prop_name, balance=num_prop, in_tx=t)
+                        
+                        # add symbol to dict
+                        coins_dict[prop_name]=str(prev_prop_id+1)
+                        coins_short_name_dict[prop_name]='SP' + str(prev_prop_id+1)
+
+                        #update the property with the hash
                         add_properties(t['tx_hash'],t)
+                        
+                        return True
                     else:
                         info('unknown tx type: '+t['tx_type_str']+' in '+tx_hash)
                         return False
