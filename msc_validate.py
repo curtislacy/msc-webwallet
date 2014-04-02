@@ -1398,8 +1398,12 @@ def check_mastercoin_transaction(t, index=-1):
                             mark_tx_invalid(t['tx_hash'], 'non supported sell offer with transaction version '+transaction_version)
                             return False
 
+                        ecosystem = int(t['ecosystem'])
+                        if ecosystem == 1:
+                            mark_tx_invalid(tx_hash, 'MSC ecosystem not yet launched')
+                            return False
+
                         #used later in validation
-                        #ecosystem = t['ecosystem']
                         #property_type = t['property_type']
                         prev_prop_id = int(t['previous_property_id'])
                         #prop_cat = t['propertyCategory']
@@ -1408,17 +1412,20 @@ def check_mastercoin_transaction(t, index=-1):
                         #prop_url = t['propertyUrl']
                         #prop_data = t['propertyData']
                         num_prop = t['numberOfProperties']
+                        
+                        #update the property with the hash
+                        prop_id=str(len(properties_dict) + 2)  # +2 to not collide with MSC/TMSC
+
+                        # add symbol to dict
+                        coins_dict[prop_name]=str(prop_id)
+                        coins_short_name_dict[prop_name]='SP' + str(prop_id)
+                        
+                        # update property dict
+                        add_properties(prop_id,t)
 
                         # update to_addr
                         update_addr_dict(from_addr, True, c, prop_name, balance=num_prop, in_tx=t)
-                        
-                        # add symbol to dict
-                        coins_dict[prop_name]=str(prev_prop_id+1)
-                        coins_short_name_dict[prop_name]='SP' + str(prev_prop_id+1)
 
-                        #update the property with the hash
-                        add_properties(t['tx_hash'],t)
-                        
                         return True
                     else:
                         info('unknown tx type: '+t['tx_type_str']+' in '+tx_hash)
