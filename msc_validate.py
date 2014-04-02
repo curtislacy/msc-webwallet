@@ -520,10 +520,10 @@ def check_bitcoin_payment(t):
 
 
 # A fresh initialized address entry
-def new_addr_entry(curr):
+def new_addr_entry():
     entry={}
     # for each currency
-    for c in coins_list+['Bitcoin',curr]:
+    for c in coins_list+['Bitcoin']:
         currency_dict={}
         # initialize all properties
         for property in addr_properties:
@@ -626,7 +626,18 @@ def update_addr_dict(addr, accomulate, *arguments, **keywords):
     # is there already entry for this address?
     if not addr_dict.has_key(addr):
         # no - so create a new one
-        addr_dict[addr]=new_addr_entry(c)
+        addr_dict[addr]=new_addr_entry()
+
+    # smart property init for dict
+    if c not in addr_dict[addr]:
+        currency_dict={}
+        # initialize all properties
+        for property in addr_properties:
+            if property.endswith('_tx'):
+                 currency_dict[property]=[]
+            else:
+                 currency_dict[property]=0
+        addr_dict[addr][c]=currency_dict
 
     # update all given fields with new values
     keys = sorted(keywords.keys())
@@ -1464,7 +1475,6 @@ def validate():
 
     # go over all tx
     for t in sorted_tx_list:
-        
         # check alarm (verify accept offers get payment in time)
         try:
             current_block=int(t['block'])
